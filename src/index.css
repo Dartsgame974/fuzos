@@ -280,35 +280,41 @@ body {
   position: relative;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
-  padding: 40px 0 20px;
+  padding: 0;
   overflow: hidden;
+  display: flex;
+  align-items: flex-end;
 }
 
 .hero-content {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   position: relative;
-  min-height: 280px;
+  min-height: 260px;
+  width: 100%;
 }
 
 .hero-fuze-img {
   position: absolute;
-  left: 10%;
+  left: 6%;
   bottom: 0;
-  height: 290px;
+  height: 260px;
   object-fit: contain;
   z-index: 2;
   pointer-events: none;
   filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.12));
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  vertical-align: bottom;
+  display: block;
 }
 
 .hero-title-wrap {
   position: relative;
   z-index: 1;
   text-align: center;
-  padding-left: 140px;
+  padding: 40px 20px 30px 160px;
+  animation: fadeInUp 0.5s ease-out;
 }
 
 .hero-main-title {
@@ -730,9 +736,204 @@ body {
 }
 
 .record-card.color-sky {
-  background: var(--card-sky-blue);
-  color: #0c4a6e;
+  background: #e0f2fe;
+  color: #032b43 !important;
+  border: 1px solid #bae6fd;
 }
+
+.record-card.color-sky .record-card-label {
+  color: #0369a1 !important;
+  font-weight: 800;
+}
+
+.record-card.color-sky .record-card-val {
+  color: #032b43 !important;
+  font-weight: 900;
+}
+
+[data-theme='dark'] .record-card.color-sky {
+  background: #0c2d48;
+  color: #f0f9ff !important;
+  border: 1px solid #0284c7;
+}
+
+[data-theme='dark'] .record-card.color-sky .record-card-label {
+  color: #7dd3fc !important;
+}
+
+[data-theme='dark'] .record-card.color-sky .record-card-val {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Interactive Evolution Chart Styles
+   ========================================================================== */
+
+.chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  margin-top: 10px;
+  animation: fadeInUp 0.4s ease-out;
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.chart-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
+
+.chart-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.chart-toggle-group {
+  display: flex;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-card);
+  gap: 4px;
+}
+
+.chart-toggle-btn {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.chart-toggle-btn.active {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+.chart-svg-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: visible;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.peak-pulse {
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    r: 9;
+    opacity: 0.6;
+  }
+  50% {
+    r: 15;
+    opacity: 0.15;
+  }
+}
+
+.chart-tooltip {
+  position: absolute;
+  transform: translate(-50%, -125%);
+  background: #111827;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  pointer-events: none;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  border: 1px solid #374151;
+  white-space: nowrap;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.tooltip-title {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 600;
+}
+
+.tooltip-value {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.tooltip-peak-tag {
+  font-size: 0.65rem;
+  background: #dc2626;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Micro Animations Keyframes
+   ========================================================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.record-card, .metric-pill, .channel-card, .occ-card {
+  animation: fadeInUp 0.4s ease-out backwards;
+}
+
+.record-card:nth-child(1) { animation-delay: 0.05s; }
+.record-card:nth-child(2) { animation-delay: 0.1s; }
+.record-card:nth-child(3) { animation-delay: 0.15s; }
+.record-card:nth-child(4) { animation-delay: 0.2s; }
+.record-card:nth-child(5) { animation-delay: 0.25s; }
+.record-card:nth-child(6) { animation-delay: 0.3s; }
 
 .record-card-top {
   display: flex;

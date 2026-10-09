@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import fuzosData from './data/fuzos_data.json';
+import EvolutionChart from './components/EvolutionChart';
 import { 
   Sun, 
   Moon, 
@@ -383,6 +384,13 @@ export default function App() {
                 })}
               </div>
             </div>
+
+            {/* Interactive Evolution Chart */}
+            <EvolutionChart 
+              dataset={currentDataset} 
+              derivWord={derivWord} 
+              singleWord={singleWord} 
+            />
 
             {/* Periodic Stats Pills */}
             <div className="metrics-pills-row">
