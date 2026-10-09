@@ -628,8 +628,44 @@ body {
   border-color: var(--hero-red);
 }
 
-.zapper-action-btn.primary:hover {
-  background: var(--hero-red-hover);
+/* Zapper Progress Bar */
+.zapper-progress-container {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.zapper-progress-bar {
+  height: 100%;
+  background: var(--hero-red);
+  transition: width 0.1s linear;
+}
+
+.zapper-toggle-btn {
+  background: #1e212b;
+  color: #ffffff;
+  border: 1px solid #333;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-weight: 700;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.zapper-toggle-btn.active {
+  background: #15803d;
+  border-color: #22c55e;
+  color: #ffffff;
+}
+
+.zapper-toggle-btn:hover {
+  filter: brightness(1.1);
 }
 
 /* ==========================================================================

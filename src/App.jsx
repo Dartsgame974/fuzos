@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import fuzosData from './data/fuzos_data.json';
 import { 
   Sun, 
@@ -8,7 +8,6 @@ import {
   ExternalLink, 
   X, 
   Calendar, 
-  Clock, 
   Award, 
   Sparkles, 
   Video,
@@ -17,7 +16,8 @@ import {
   ChevronLeft,
   Shuffle,
   Construction,
-  RotateCcw
+  PlayCircle,
+  PauseCircle
 } from 'lucide-react';
 
 const CHANNEL_CONFIG = {
@@ -66,6 +66,9 @@ export default function App() {
   // Zapper State
   const [isZapperOpen, setIsZapperOpen] = useState(false);
   const [zapperIndex, setZapperIndex] = useState(0);
+  const [autoAdvance, setAutoAdvance] = useState(true);
+  const [zapperProgress, setZapperProgress] = useState(0);
+  const progressTimerRef = useRef(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -118,23 +121,60 @@ export default function App() {
   const handleZapperNext = useCallback(() => {
     const list = currentDataset.occurrences || [];
     if (!list.length) return;
+    setZapperProgress(0);
     setZapperIndex(prev => (prev + 1) % list.length);
   }, [currentDataset]);
 
   const handleZapperPrev = useCallback(() => {
     const list = currentDataset.occurrences || [];
     if (!list.length) return;
+    setZapperProgress(0);
     setZapperIndex(prev => (prev - 1 + list.length) % list.length);
   }, [currentDataset]);
 
   const handleZapperRandom = useCallback(() => {
     const list = currentDataset.occurrences || [];
     if (!list.length) return;
+    setZapperProgress(0);
     const randIdx = Math.floor(Math.random() * list.length);
     setZapperIndex(randIdx);
   }, [currentDataset]);
 
-  // Keyboard Shortcuts (Arrow keys for zapper, Escape for modals)
+  // Auto-advance Timer logic
+  useEffect(() => {
+    if (!isZapperOpen || !autoAdvance || !currentZapperClip) {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+      setZapperProgress(0);
+      return;
+    }
+
+    const start = currentZapperClip.start || 0;
+    const end = currentZapperClip.end || (start + 4);
+    // Give enough time to hear the sentence + the word + brief buffer (min 4.5s, max 8.5s)
+    const clipDurationSec = Math.max(4.5, Math.min(8.5, (end - start) + 1.8));
+    const totalMs = clipDurationSec * 1000;
+    const intervalMs = 100;
+    let elapsedMs = 0;
+
+    setZapperProgress(0);
+
+    progressTimerRef.current = setInterval(() => {
+      elapsedMs += intervalMs;
+      const pct = Math.min(100, (elapsedMs / totalMs) * 100);
+      setZapperProgress(pct);
+
+      if (elapsedMs >= totalMs) {
+        clearInterval(progressTimerRef.current);
+        handleZapperNext();
+      }
+    }, intervalMs);
+
+    return () => {
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+    };
+  }, [isZapperOpen, autoAdvance, zapperIndex, currentZapperClip, handleZapperNext]);
+
+  // Keyboard Shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
@@ -151,6 +191,9 @@ export default function App() {
         } else if (e.key === ' ') {
           e.preventDefault();
           handleZapperRandom();
+        } else if (e.key.toLowerCase() === 'a') {
+          e.preventDefault();
+          setAutoAdvance(prev => !prev);
         }
       }
     };
@@ -165,6 +208,7 @@ export default function App() {
 
   const startZapper = (initialIndex = 0) => {
     setZapperIndex(initialIndex);
+    setZapperProgress(0);
     setIsZapperOpen(true);
   };
 
@@ -250,7 +294,7 @@ export default function App() {
             <Construction size={48} color="#f59e0b" />
             <h2 className="wip-title">Module « Objectivement » en cours de reconstruction</h2>
             <p className="wip-desc">
-              Le module d'analyse historique pour « Objectivement » est en train d'être réaligné avec la nouvelle base haute précision.
+              Le module d'analyse historique pour « Objectivement » est en cours de recalibrage avec la base haute précision.
             </p>
             <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
               <button 
@@ -610,7 +654,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Zapper Modal (Suivant, Précédent, Aléatoire) */}
+      {/* Zapper Modal (Suivant, Précédent, Aléatoire + Auto-lecture) */}
       {isZapperOpen && currentZapperClip && (
         <div className="modal-backdrop" onClick={() => setIsZapperOpen(false)}>
           <div className="zapper-modal-dialog" onClick={(e) => e.stopPropagation()}>
@@ -621,10 +665,27 @@ export default function App() {
                   Zappeur Gigantitude • Clip #{zapperIndex + 1} / {currentDataset.occurrences?.length}
                 </span>
               </div>
-              <button className="modal-close-btn" style={{ color: '#fff' }} onClick={() => setIsZapperOpen(false)}>
-                <X size={20} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <button 
+                  className={`zapper-toggle-btn ${autoAdvance ? 'active' : ''}`}
+                  onClick={() => setAutoAdvance(prev => !prev)}
+                  title="Activer ou désactiver le passage automatique au clip suivant"
+                >
+                  {autoAdvance ? <PlayCircle size={15} /> : <PauseCircle size={15} />}
+                  <span>Auto-lecture {autoAdvance ? 'ON' : 'OFF'}</span>
+                </button>
+                <button className="modal-close-btn" style={{ color: '#fff' }} onClick={() => setIsZapperOpen(false)}>
+                  <X size={20} />
+                </button>
+              </div>
             </div>
+
+            {/* Auto-lecture Progress Bar */}
+            {autoAdvance && (
+              <div className="zapper-progress-container">
+                <div className="zapper-progress-bar" style={{ width: `${zapperProgress}%` }} />
+              </div>
+            )}
 
             <div className="modal-player-wrap">
               <iframe
@@ -638,7 +699,7 @@ export default function App() {
             </div>
 
             <div className="zapper-controls-bar">
-              <div style={{ maxWidth: '400px' }}>
+              <div style={{ maxWidth: '380px' }}>
                 <div style={{ fontSize: '0.9rem', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {currentZapperClip.title}
                 </div>
