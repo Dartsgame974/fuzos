@@ -584,6 +584,7 @@ export default function App() {
             </div>
             <div className="modal-player-wrap">
               <iframe
+                key={`${activeVideoModal.videoId}_${Math.floor(activeVideoModal.start)}`}
                 src={`https://www.youtube-nocookie.com/embed/${activeVideoModal.videoId}?start=${Math.floor(activeVideoModal.start)}&autoplay=1&rel=0`}
                 title={activeVideoModal.title}
                 className="modal-player-iframe"
@@ -627,7 +628,7 @@ export default function App() {
 
             <div className="modal-player-wrap">
               <iframe
-                key={`${currentZapperClip.videoId}_${currentZapperClip.start}`}
+                key={`${currentZapperClip.videoId}_${Math.floor(currentZapperClip.start)}`}
                 src={`https://www.youtube-nocookie.com/embed/${currentZapperClip.videoId}?start=${Math.floor(currentZapperClip.start)}&autoplay=1&rel=0`}
                 title={currentZapperClip.title}
                 className="modal-player-iframe"
